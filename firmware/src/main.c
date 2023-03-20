@@ -25,6 +25,12 @@
 #define BUT_IDX      19
 #define BUT_IDX_MASK (1 << BUT_IDX)
 
+#define BUT_PIO2      PIOB
+#define BUT_PIO_ID2   ID_PIOB
+#define BUT_IDX2      2
+#define BUT_IDX_MASK2 (1 << BUT_IDX2)
+
+
 //usart (bluetooth ou serial)
 //Descomente para enviar dados
 //pela serial debug
@@ -65,14 +71,11 @@ extern void xPortSysTickHandler(void);
 /* variaveis globais                                                    */
 /************************************************************************/
 volatile char but_flag = 0;
+volatile char but_flag2 = 0;
 
 /************************************************************************/
 /* RTOS application HOOK                                                */
 /************************************************************************/
-
-void but_callback (void) {
-	but_flag = 1;
-}
 
 void pisca_led(void) {
 	pio_clear(LED_PIO, LED_IDX_MASK);
@@ -115,6 +118,14 @@ extern void vApplicationMallocFailedHook(void) {
 // /* handlers / callbacks                                                 */
 // /************************************************************************/
 
+void but_callback (void) {
+	but_flag = 1;
+}
+
+void but_callback2 (void) {
+	but_flag2 = 1;
+}
+
 // /************************************************************************/
 // /* funcoes                                                              */
 // /************************************************************************/
@@ -124,18 +135,26 @@ void io_init(void) {
 	// Ativa PIOs
 	pmc_enable_periph_clk(LED_PIO_ID);
 	pmc_enable_periph_clk(BUT_PIO_ID);
+	pmc_enable_periph_clk(BUT_PIO_ID2);
 
 	// Configura Pinos
 	pio_configure(LED_PIO, PIO_OUTPUT_0, LED_IDX_MASK, PIO_DEFAULT);
 	pio_configure(BUT_PIO, PIO_INPUT, BUT_IDX_MASK, PIO_PULLUP);
+	pio_configure(BUT_PIO2, PIO_INPUT, BUT_IDX_MASK2, PIO_PULLUP);
 
 	// Configura interrupção
 	pio_handler_set(BUT_PIO, BUT_PIO_ID, BUT_IDX_MASK, PIO_IT_FALL_EDGE, but_callback);
 	pio_enable_interrupt(BUT_PIO, BUT_IDX_MASK);
 
+	pio_handler_set(BUT_PIO2, BUT_PIO_ID2, BUT_IDX_MASK2, PIO_IT_FALL_EDGE, but_callback2);
+	pio_enable_interrupt(BUT_PIO2, BUT_IDX_MASK2);
+
 	// Configura NVIC
 	NVIC_EnableIRQ(BUT_PIO_ID);
 	NVIC_SetPriority(BUT_PIO_ID, 4);
+
+	NVIC_EnableIRQ(BUT_PIO_ID2);
+	NVIC_SetPriority(BUT_PIO_ID2, 4);
 }
 
 static void configure_console(void) {
@@ -250,7 +269,11 @@ void task_bluetooth(void) {
 		// atualiza valor do botão
 		if(pio_get(BUT_PIO, PIO_INPUT, BUT_IDX_MASK) == 0) {
 			button1 = '1';
-		} else {
+		} 
+		if (pio_get (BUT_PIO2, PIO_INPUT, BUT_IDX_MASK2) == 0) {
+			button1 = '2';
+		} 
+		else {
 			button1 = '0';
 		}
 
