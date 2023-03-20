@@ -4,9 +4,10 @@ import argparse
 import time
 import logging
 
+
 class MyControllerMap:
     def __init__(self):
-        self.button = {'A': 'L', 'B': 'K', 'C': 'J'} 
+        self.button = {'A': 'space', 'B': 'K', 'C': 'J'} 
 
 class SerialControllerInterface:
     # Protocolo
