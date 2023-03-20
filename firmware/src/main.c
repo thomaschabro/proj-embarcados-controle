@@ -281,21 +281,21 @@ int main(void) {
 	board_init();
 	io_init();
 	delay_init();
-	// configure_console();
+	configure_console();
+
 
 	// /* Create task to make led blink */
-	// xTaskCreate(task_bluetooth, "BLT", TASK_BLUETOOTH_STACK_SIZE, NULL,	TASK_BLUETOOTH_STACK_PRIORITY, NULL);
-while(1){
-
-	if (but_flag == 1) {
-		pisca_led();
-		but_flag = 0;
-	}
-
-}
-
+	xTaskCreate(task_bluetooth, "BLT", TASK_BLUETOOTH_STACK_SIZE, NULL,	TASK_BLUETOOTH_STACK_PRIORITY, NULL);
 	// /* Start the scheduler. */
-	 vTaskStartScheduler();
+	vTaskStartScheduler();
+	while(1){
+
+		// if (but_flag == 1) {
+		// 	pisca_led();
+		// 	but_flag = 0;
+		// }
+
+	}
 
 	
 	pmc_sleep(SAM_PM_SMODE_SLEEP_WFI);
