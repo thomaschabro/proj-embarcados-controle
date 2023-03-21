@@ -4,9 +4,10 @@ import argparse
 import time
 import logging
 
+
 class MyControllerMap:
     def __init__(self):
-        self.button = {'A': 'L', 'B': 'K'} # Fast forward (10 seg) pro Youtube
+        self.button = {'A': 'space', 'B': 'K', 'C': 'J'} 
 
 class SerialControllerInterface:
     # Protocolo
@@ -34,14 +35,19 @@ class SerialControllerInterface:
             print("datab1")
             logging.info("KEYDOWN A")
             pyautogui.keyDown(self.mapping.button['A'])
-        elif data == b'2':
+        if data == b'2':
             logging.info("KEYDOWN B")
             pyautogui.keyDown(self.mapping.button['B'])
-        elif data == b'0':
+        if data == b'3':
+            logging.info("KEYDOWN C")
+            pyautogui.keyDown(self.mapping.button['C'])
+        if data == b'0':
             logging.info("KEYUP A")
             pyautogui.keyUp(self.mapping.button['A'])
             logging.info("KEYUP B")
             pyautogui.keyUp(self.mapping.button['B'])
+            logging.info("KEYUP C")
+            pyautogui.keyUp(self.mapping.button['C'])
 
         self.incoming = self.ser.read()
 
